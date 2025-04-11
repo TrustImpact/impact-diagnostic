@@ -4,7 +4,7 @@
 export function getSiteUrl() {
   // For production, use the NEXT_PUBLIC_SITE_URL environment variable
   // For development, use localhost
-  return process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000"
+  return process.env.NEXT_PUBLIC_SITE_URL || "https://impact-diagnostic.vercel.app"
 }
 
 // Configure Supabase Auth settings
