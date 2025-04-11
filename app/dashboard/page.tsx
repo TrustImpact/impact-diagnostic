@@ -1,6 +1,10 @@
 import { cookies } from "next/headers"
 import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
+import DashboardHeader from "@/components/dashboard/dashboard-header"
+import ProjectsList from "@/components/dashboard/projects-list"
+import CreateProjectButton from "@/components/dashboard/create-project-button"
+import AuthDebug from "@/components/debug/auth-debug"
 
 export const dynamic = "force-dynamic"
 
@@ -19,19 +23,28 @@ export default async function DashboardPage() {
     redirect("/login")
   }
 
+  // Get projects
+  const { data: projects } = await supabase
+    .from("projects")
+    .select("*")
+    .or(`owner_id.eq.${session.user.id},project_collaborators(user_id).eq.${session.user.id}`)
+    .order("created_at", { ascending: false })
+
   return (
     <div className="container py-10">
-      <h1 className="text-3xl font-bold">Dashboard</h1>
-      <p className="mt-4">Welcome, {session.user.email}</p>
-      <p className="mt-2">You are successfully logged in!</p>
+      <DashboardHeader />
 
-      <div className="mt-8 p-4 bg-gray-100 rounded-md">
-        <h2 className="text-xl font-semibold">Debug Information</h2>
-        <p className="mt-2">User ID: {session.user.id}</p>
-        <p>Email: {session.user.email}</p>
-        <p>Session expires at: {new Date(session.expires_at! * 1000).toLocaleString()}</p>
+      <div className="mt-8 flex justify-between items-center">
+        <h2 className="text-3xl font-bold tracking-tight">Your Projects</h2>
+        <CreateProjectButton />
       </div>
+
+      <div className="mt-6">
+        <ProjectsList projects={projects || []} />
+      </div>
+
+      {/* Debug component - remove in production */}
+      <AuthDebug />
     </div>
   )
 }
-
