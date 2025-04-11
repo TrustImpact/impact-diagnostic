@@ -1,129 +1,68 @@
 "use client"
-
-import { useState } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
-import { zodResolver } from "@hookform/resolvers/zod"
-import { useForm } from "react-hook-form"
-import * as z from "zod"
-import { supabase } from "@/lib/supabase/client"
+import { signIn } from "@/lib/actions/auth-actions"
+import { useFormState, useFormStatus } from "react-dom"
 import { Button } from "@/components/ui/button"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { toast } from "@/hooks/use-toast"
 import { AlertCircle } from "lucide-react"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 
-const formSchema = z.object({
-  email: z.string().email({
-    message: "Please enter a valid email address.",
-  }),
-  password: z.string().min(6, {
-    message: "Password must be at least 6 characters.",
-  }),
-})
+// Initial state for the form
+const initialState = {
+  success: false,
+  error: null as string | null,
+}
+
+// Submit button with loading state
+function SubmitButton() {
+  const { pending } = useFormStatus()
+
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? "Signing in..." : "Sign In"}
+    </Button>
+  )
+}
 
 export default function LoginForm() {
-  const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
-  const [authError, setAuthError] = useState<string | null>(null)
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      email: "",
-      password: "",
-    },
-  })
-
-  async function onSubmit(values: z.infer<typeof formSchema>) {
-    setIsLoading(true)
-    setAuthError(null)
-
-    try {
-      console.log("Attempting to sign in with:", values.email)
-
-      // Use signInWithPassword which handles the session directly
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: values.email,
-        password: values.password,
-      })
-
-      if (error) {
-        console.error("Login error:", error)
-        setAuthError(error.message)
-        throw error
-      }
-
-      if (data.user) {
-        console.log("Login successful, user:", data.user.id)
-        toast({
-          title: "Login successful",
-          description: "You have been signed in successfully.",
-        })
-
-        // Direct navigation to dashboard
-        window.location.href = "/dashboard"
-      }
-    } catch (error: any) {
-      console.error("Login error:", error)
-      toast({
-        title: "Error signing in",
-        description: error.message || "Please check your credentials and try again.",
-        variant: "destructive",
-      })
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  // Use React's useFormState hook to handle form submission
+  const [state, formAction] = useFormState(async (prevState: any, formData: FormData) => {
+    const result = await signIn(formData)
+    return { ...prevState, ...result }
+  }, initialState)
 
   return (
     <div className="space-y-6">
-      {authError && (
+      {state.error && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>{authError}</AlertDescription>
+          <AlertDescription>{state.error}</AlertDescription>
         </Alert>
       )}
 
-      <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-          <FormField
-            control={form.control}
-            name="email"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Email</FormLabel>
-                <FormControl>
-                  <Input placeholder="name@example.com" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <FormField
-            control={form.control}
-            name="password"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Password</FormLabel>
-                <FormControl>
-                  <Input type="password" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-          <div className="flex justify-end">
-            <Link href="/forgot-password" className="text-sm text-primary hover:underline">
-              Forgot password?
-            </Link>
-          </div>
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "Sign In"}
-          </Button>
-        </form>
-      </Form>
+      <form action={formAction} className="space-y-4">
+        <div className="space-y-2">
+          <label htmlFor="email" className="text-sm font-medium">
+            Email
+          </label>
+          <Input id="email" name="email" type="email" placeholder="name@example.com" required />
+        </div>
+
+        <div className="space-y-2">
+          <label htmlFor="password" className="text-sm font-medium">
+            Password
+          </label>
+          <Input id="password" name="password" type="password" required />
+        </div>
+
+        <div className="flex justify-end">
+          <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+            Forgot password?
+          </Link>
+        </div>
+
+        <SubmitButton />
+      </form>
     </div>
   )
 }
