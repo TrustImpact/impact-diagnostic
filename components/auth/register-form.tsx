@@ -59,8 +59,15 @@ export default function RegisterForm() {
         description: "Please check your email to verify your account.",
       })
 
-      router.push("/login")
+      // Reset form
+      form.reset()
+
+      // Redirect to login page after a short delay
+      setTimeout(() => {
+        router.push("/login")
+      }, 2000)
     } catch (error: any) {
+      console.error("Registration error:", error)
       toast({
         title: "Error creating account",
         description: error.message || "Something went wrong. Please try again.",
