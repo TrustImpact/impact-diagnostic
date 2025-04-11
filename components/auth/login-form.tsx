@@ -43,6 +43,7 @@ export default function LoginForm() {
     try {
       console.log("Attempting to sign in with:", values.email)
 
+      // Use signInWithPassword which handles the session directly
       const { data, error } = await supabase.auth.signInWithPassword({
         email: values.email,
         password: values.password,
@@ -61,22 +62,8 @@ export default function LoginForm() {
           description: "You have been signed in successfully.",
         })
 
-        // Force a refresh to update the auth state
-        router.refresh()
-
-        console.log("Redirecting to dashboard...")
-
-        // Add a small delay before redirection to ensure the auth state is updated
-        setTimeout(() => {
-          // Try Next.js router first
-          router.push("/dashboard")
-
-          // Use window.location as a fallback
-          setTimeout(() => {
-            console.log("Fallback redirection...")
-            window.location.href = "/dashboard"
-          }, 500)
-        }, 500)
+        // Direct navigation to dashboard
+        window.location.href = "/dashboard"
       }
     } catch (error: any) {
       console.error("Login error:", error)
