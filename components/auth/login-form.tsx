@@ -64,8 +64,19 @@ export default function LoginForm() {
         // Force a refresh to update the auth state
         router.refresh()
 
-        // Redirect to dashboard
-        router.push("/dashboard")
+        console.log("Redirecting to dashboard...")
+
+        // Add a small delay before redirection to ensure the auth state is updated
+        setTimeout(() => {
+          // Try Next.js router first
+          router.push("/dashboard")
+
+          // Use window.location as a fallback
+          setTimeout(() => {
+            console.log("Fallback redirection...")
+            window.location.href = "/dashboard"
+          }, 500)
+        }, 500)
       }
     } catch (error: any) {
       console.error("Login error:", error)
