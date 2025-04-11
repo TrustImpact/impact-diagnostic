@@ -15,3 +15,8 @@ export const authConfig = {
   // The path to redirect to after a successful sign-in
   redirectTo: `${getSiteUrl()}/auth/callback`,
 }
+
+// Export the full callback URL for use in Supabase configuration
+export const getAuthCallbackUrl = () => {
+  return `${getSiteUrl()}/auth/callback`
+}
