@@ -10,9 +10,18 @@ export async function middleware(req: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // If user is not signed in and the current path is not /login or /register,
+  // Auth callback route should always be accessible
+  if (req.nextUrl.pathname.startsWith("/auth/callback")) {
+    return res
+  }
+
+  // Public routes that don't require authentication
+  const publicRoutes = ["/login", "/register", "/", "/about", "/features", "/pricing", "/contact"]
+  const isPublicRoute = publicRoutes.includes(req.nextUrl.pathname)
+
+  // If user is not signed in and the current path requires authentication,
   // redirect the user to /login
-  if (!session && !["/login", "/register", "/"].includes(req.nextUrl.pathname)) {
+  if (!session && !isPublicRoute) {
     return NextResponse.redirect(new URL("/login", req.url))
   }
 
@@ -26,5 +35,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg|auth/callback).*)"],
+  matcher: ["/((?!api|_next/static|_next/image|favicon.ico|.*\\.svg).*)"],
 }
