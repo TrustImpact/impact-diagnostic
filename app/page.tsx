@@ -13,7 +13,7 @@ export default function HomePage() {
       <main className="flex-1">
         {/* Hero Section */}
         <section className="w-full py-12 md:py-24 lg:py-32 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <div className="space-y-2 max-w-3xl">
                 <h1 className="text-4xl font-bold tracking-tighter sm:text-5xl md:text-6xl">
@@ -40,7 +40,7 @@ export default function HomePage() {
 
         {/* Features Section */}
         <section className="w-full py-12 md:py-24 bg-gray-50">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Powerful features for measuring impact
@@ -66,7 +66,7 @@ export default function HomePage() {
 
         {/* How It Works Section */}
         <section className="w-full py-12 md:py-24 bg-white">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center mb-12">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl">How the Impact Diagnostic works</h2>
               <p className="mx-auto max-w-[700px] text-gray-500 md:text-xl">
@@ -106,7 +106,7 @@ export default function HomePage() {
 
         {/* CTA Section */}
         <section className="w-full py-12 md:py-24 bg-primary text-white">
-          <div className="container px-4 md:px-6">
+          <div className="container px-4 md:px-6 mx-auto">
             <div className="flex flex-col items-center justify-center space-y-4 text-center">
               <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
                 Ready to improve your social impact?
