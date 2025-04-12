@@ -1,12 +1,12 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import Image from "next/image"
 import { signOut } from "@/lib/actions/auth-actions"
 import { cn } from "@/lib/utils"
-import { BarChart3, Home, LogOut, Menu, Settings, User, X, FolderKanban } from "lucide-react"
+import { BarChart3, Home, LogOut, Menu, Settings, User, X, FolderKanban, Shield } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { supabase } from "@/lib/supabase/client"
 
 interface DashboardNavProps {
   user: {
@@ -24,18 +25,40 @@ interface DashboardNavProps {
     email?: string | null
     full_name?: string | null
     avatar_url?: string | null
+    is_super_user?: boolean
   }
 }
 
 export default function DashboardNav({ user }: DashboardNavProps) {
   const pathname = usePathname()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [isSuperUser, setIsSuperUser] = useState(!!user.is_super_user)
+
+  useEffect(() => {
+    async function checkSuperUser() {
+      if (user.is_super_user === undefined) {
+        try {
+          const { data } = await supabase.from("profiles").select("is_super_user").eq("id", user.id).single()
+          setIsSuperUser(!!data?.is_super_user)
+        } catch (error) {
+          console.error("Error checking super user status:", error)
+        }
+      }
+    }
+
+    checkSuperUser()
+  }, [user.id, user.is_super_user])
 
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Projects", href: "/projects", icon: FolderKanban },
     { name: "Analytics", href: "/analytics", icon: BarChart3 },
   ]
+
+  // Add Admin link for super users
+  if (isSuperUser) {
+    navigation.push({ name: "Admin", href: "/admin", icon: Shield })
+  }
 
   const userInitials = user.full_name
     ? user.full_name
@@ -108,6 +131,14 @@ export default function DashboardNav({ user }: DashboardNavProps) {
                     Settings
                   </Link>
                 </DropdownMenuItem>
+                {isSuperUser && (
+                  <DropdownMenuItem asChild>
+                    <Link href="/admin" className="cursor-pointer flex w-full">
+                      <Shield className="mr-2 h-4 w-4" />
+                      Admin Dashboard
+                    </Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   className="cursor-pointer"
@@ -193,6 +224,16 @@ export default function DashboardNav({ user }: DashboardNavProps) {
                 <Settings className="mr-2 h-5 w-5" />
                 Settings
               </Link>
+              {isSuperUser && (
+                <Link
+                  href="/admin"
+                  className="flex items-center px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Shield className="mr-2 h-5 w-5" />
+                  Admin Dashboard
+                </Link>
+              )}
               <button
                 onClick={() => signOut()}
                 className="flex w-full items-center px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
