@@ -3,7 +3,7 @@ import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import ProjectsList from "@/components/dashboard/projects-list"
 import CreateProjectButton from "@/components/dashboard/create-project-button"
 
-export const dynamic = "force_dynamic"
+export const dynamic = "force-dynamic"
 
 export default async function ProjectsPage() {
   const cookieStore = cookies()
