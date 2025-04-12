@@ -28,7 +28,9 @@ export default async function DashboardLayout({ children }: { children: React.Re
     <div className="flex min-h-screen flex-col">
       <DashboardNav user={profile || { id: session.user.id, email: session.user.email }} />
       <main className="flex-1 bg-gray-50">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">{children}</div>
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8 w-full flex justify-center">
+          <div className="w-full max-w-7xl">{children}</div>
+        </div>
       </main>
     </div>
   )
