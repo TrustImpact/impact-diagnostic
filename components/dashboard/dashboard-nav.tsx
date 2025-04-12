@@ -69,7 +69,6 @@ export default function DashboardNav({ user }: DashboardNavProps) {
         .split(" ")
         .map((n) => n[0])
         .join("")
-        .toUpperCase()
     : user.email?.[0].toUpperCase() || "U"
 
   return (
@@ -130,7 +129,7 @@ export default function DashboardNav({ user }: DashboardNavProps) {
                   </Link>
                 </DropdownMenuItem>
                 <DropdownMenuItem asChild>
-                  <Link href="/settings" className="cursor-pointer flex w-full">
+                  <Link href="/profile" className="cursor-pointer flex w-full">
                     <Settings className="mr-2 h-4 w-4" />
                     Settings
                   </Link>
@@ -221,7 +220,7 @@ export default function DashboardNav({ user }: DashboardNavProps) {
                 Profile
               </Link>
               <Link
-                href="/settings"
+                href="/profile"
                 className="flex items-center px-4 py-2 text-base font-medium text-gray-500 hover:bg-gray-100 hover:text-gray-800"
                 onClick={() => setMobileMenuOpen(false)}
               >
