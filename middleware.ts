@@ -2,8 +2,18 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 import { createMiddlewareClient } from "@supabase/auth-helpers-nextjs"
 
-// Define public routes that don't require authentication
-const publicRoutes = ["/", "/login", "/register", "/about", "/features", "/pricing", "/contact", "/forgot-password"]
+// Add "/admin" to the publicRoutes array to bypass middleware checks temporarily
+const publicRoutes = [
+  "/",
+  "/login",
+  "/register",
+  "/about",
+  "/features",
+  "/pricing",
+  "/contact",
+  "/forgot-password",
+  "/admin",
+]
 
 export async function middleware(req: NextRequest) {
   const res = NextResponse.next()
