@@ -57,7 +57,11 @@ export default function DashboardNav({ user }: DashboardNavProps) {
 
   // Add Admin link for super users
   if (isSuperUser) {
-    navigation.push({ name: "Admin", href: "/admin", icon: Shield })
+    navigation.push({
+      name: "Admin",
+      href: "/admin",
+      icon: Shield,
+    })
   }
 
   const userInitials = user.full_name
