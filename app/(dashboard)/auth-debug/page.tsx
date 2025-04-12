@@ -1,6 +1,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import AuthDebug from "@/components/debug/auth-debug"
+import ForceLogin from "@/components/debug/force-login"
+import FixedProjectDebug from "@/components/debug/fixed-project-debug"
 import { ArrowLeft } from "lucide-react"
 
 export default function AuthDebugPage() {
@@ -19,6 +21,10 @@ export default function AuthDebugPage() {
       <div className="space-y-8 max-w-2xl">
         <AuthDebug />
 
+        <ForceLogin />
+
+        <FixedProjectDebug />
+
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Authentication Troubleshooting</h2>
 
@@ -29,12 +35,14 @@ export default function AuthDebugPage() {
               <li>Browser privacy settings might be blocking cookies</li>
               <li>CORS issues might be preventing proper authentication</li>
               <li>Network issues might be preventing communication with Supabase</li>
+              <li>Client-side Supabase initialization might not be accessing the cookie correctly</li>
             </ul>
           </div>
 
           <div className="space-y-2">
             <h3 className="font-medium">Try These Solutions:</h3>
             <ul className="list-disc pl-5 space-y-1">
+              <li>Use the "Force Login Fix" button above</li>
               <li>Click "Refresh Authentication Session" above</li>
               <li>Log out and log back in</li>
               <li>Clear your browser cookies and cache</li>
