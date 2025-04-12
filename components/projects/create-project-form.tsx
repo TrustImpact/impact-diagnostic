@@ -142,12 +142,22 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
 
       if (assessmentError) throw assessmentError
 
+      // Add more detailed logging
+      console.log("Project created successfully:", project)
+      console.log("Current user ID:", userId)
+
       toast({
         title: "Project created",
         description: "Your new project has been created successfully.",
       })
 
-      router.push(`/projects/${project.id}`)
+      // Force a router refresh before navigation to ensure data is updated
+      router.refresh()
+
+      // Add a small delay before navigation to ensure refresh completes
+      setTimeout(() => {
+        router.push(`/projects/${project.id}`)
+      }, 500)
     } catch (error: any) {
       console.error("Error creating project:", error)
       toast({
