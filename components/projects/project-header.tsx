@@ -1,5 +1,5 @@
 import Link from "next/link"
-import { ArrowLeft, Calendar, Settings } from "lucide-react"
+import { Calendar, Settings } from "lucide-react"
 import { format } from "date-fns"
 import { Button } from "@/components/ui/button"
 
@@ -16,13 +16,6 @@ interface ProjectHeaderProps {
 export default function ProjectHeader({ project }: ProjectHeaderProps) {
   return (
     <div>
-      <Button variant="ghost" asChild className="mb-4 pl-0 hover:bg-transparent">
-        <Link href="/dashboard">
-          <ArrowLeft className="mr-2 h-4 w-4" />
-          Back to Dashboard
-        </Link>
-      </Button>
-
       <div className="flex flex-col md:flex-row md:items-center md:justify-between">
         <div>
           <h1 className="text-3xl font-bold">{project.name}</h1>
