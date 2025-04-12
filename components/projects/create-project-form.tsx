@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useMemo } from "react"
 import { useRouter } from "next/navigation"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -8,17 +8,18 @@ import * as z from "zod"
 import { supabase } from "@/lib/supabase/client"
 import { Button } from "@/components/ui/button"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { toast } from "@/hooks/use-toast"
+import { format } from "date-fns"
 
 const formSchema = z.object({
-  name: z.string().min(3, {
-    message: "Project name must be at least 3 characters.",
-  }),
   organization_id: z.string().min(1, {
     message: "Please select an organization.",
+  }),
+  assessment_round: z.enum(["first", "follow_up"], {
+    required_error: "Please select an assessment round.",
   }),
   description: z.string().optional(),
 })
@@ -37,15 +38,30 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [organizations, setOrganizations] = useState<Organization[]>([])
   const [isLoadingOrgs, setIsLoadingOrgs] = useState(true)
+  const [selectedOrgName, setSelectedOrgName] = useState<string>("")
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      name: "",
       organization_id: "",
+      assessment_round: "first",
       description: "",
     },
   })
+
+  // Watch the organization_id field to update the selected org name
+  const organizationId = form.watch("organization_id")
+  const assessmentRound = form.watch("assessment_round")
+
+  // Generate project name based on selected organization, assessment round, and current date
+  const generatedProjectName = useMemo(() => {
+    if (!selectedOrgName) return ""
+
+    const roundText = assessmentRound === "first" ? "First Assessment" : "Follow-up Assessment"
+    const dateText = format(new Date(), "MM/yy")
+
+    return `${selectedOrgName} - ${roundText} - ${dateText}`
+  }, [selectedOrgName, assessmentRound])
 
   useEffect(() => {
     async function fetchOrganizations() {
@@ -70,7 +86,26 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
     fetchOrganizations()
   }, [])
 
+  // Update selected org name when organization_id changes
+  useEffect(() => {
+    if (organizationId) {
+      const org = organizations.find((org) => org.id === organizationId)
+      setSelectedOrgName(org?.name || "")
+    } else {
+      setSelectedOrgName("")
+    }
+  }, [organizationId, organizations])
+
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    if (!generatedProjectName) {
+      toast({
+        title: "Error",
+        description: "Please select an organization first.",
+        variant: "destructive",
+      })
+      return
+    }
+
     setIsLoading(true)
 
     try {
@@ -81,15 +116,18 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
         throw new Error("Selected organization not found")
       }
 
-      // Create the project
+      // Create the project with the generated name
       const { data: project, error: projectError } = await supabase
         .from("projects")
         .insert({
-          name: values.name,
+          name: generatedProjectName,
           organization_id: values.organization_id,
           organization_name: organization.name,
           description: values.description || null,
           owner_id: userId,
+          metadata: {
+            assessment_round: values.assessment_round,
+          },
         })
         .select()
         .single()
@@ -125,21 +163,6 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <FormField
-          control={form.control}
-          name="name"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Project Name</FormLabel>
-              <FormControl>
-                <Input placeholder="Q3 2023 Impact Assessment" {...field} />
-              </FormControl>
-              <FormDescription>Give your project a descriptive name.</FormDescription>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
         <FormField
           control={form.control}
           name="organization_id"
@@ -178,6 +201,51 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
 
         <FormField
           control={form.control}
+          name="assessment_round"
+          render={({ field }) => (
+            <FormItem className="space-y-3">
+              <FormLabel>Assessment Round</FormLabel>
+              <FormControl>
+                <RadioGroup
+                  onValueChange={field.onChange}
+                  defaultValue={field.value}
+                  className="flex flex-col space-y-1"
+                >
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="first" />
+                    </FormControl>
+                    <FormLabel className="font-normal">First Assessment</FormLabel>
+                  </FormItem>
+                  <FormItem className="flex items-center space-x-3 space-y-0">
+                    <FormControl>
+                      <RadioGroupItem value="follow_up" />
+                    </FormControl>
+                    <FormLabel className="font-normal">Follow-up Assessment</FormLabel>
+                  </FormItem>
+                </RadioGroup>
+              </FormControl>
+              <FormDescription>
+                Indicate whether this is the first assessment or a follow-up assessment for this organization.
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* Display the generated project name */}
+        {selectedOrgName && (
+          <div className="space-y-2">
+            <FormLabel>Project Name</FormLabel>
+            <div className="p-3 border rounded-md bg-muted/30">
+              <p className="font-medium">{generatedProjectName}</p>
+            </div>
+            <FormDescription>This name is automatically generated based on your selections.</FormDescription>
+          </div>
+        )}
+
+        <FormField
+          control={form.control}
           name="description"
           render={({ field }) => (
             <FormItem>
@@ -199,7 +267,7 @@ export default function CreateProjectForm({ userId }: CreateProjectFormProps) {
           <Button type="button" variant="outline" onClick={() => router.back()} disabled={isLoading}>
             Cancel
           </Button>
-          <Button type="submit" disabled={isLoading || isLoadingOrgs}>
+          <Button type="submit" disabled={isLoading || isLoadingOrgs || !selectedOrgName}>
             {isLoading ? "Creating..." : "Create Project"}
           </Button>
         </div>
