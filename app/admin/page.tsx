@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import UsersManagement from "@/components/admin/users-management"
 import OrganizationsManagement from "@/components/admin/organizations-management"
@@ -17,15 +18,7 @@ export default async function AdminPage() {
   } = await supabase.auth.getSession()
 
   if (!session) {
-    return (
-      <div className="p-8">
-        <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-          <p className="font-bold">Error</p>
-          <p>You must be logged in to access this page.</p>
-        </div>
-      </div>
-    )
+    redirect("/login")
   }
 
   // Get user profile with separate queries to avoid the relationship error
