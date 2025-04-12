@@ -1,7 +1,5 @@
 "use client"
 
-import { FormDescription } from "@/components/ui/form"
-
 import { useState } from "react"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
@@ -17,7 +15,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog"
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Switch } from "@/components/ui/switch"
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
@@ -32,7 +30,7 @@ const formSchema = z.object({
 
 interface User {
   id: string
-  email: string
+  email: string | null
   full_name: string | null
   organization_id: string | null
   organization_name: string | null
@@ -69,15 +67,13 @@ export default function UsersManagement({ users: initialUsers, organizations }: 
     setIsLoading(true)
 
     try {
-      const { data, error } = await supabase
+      const { error } = await supabase
         .from("profiles")
         .update({
           organization_id: values.organization_id,
           is_super_user: values.is_super_user,
         })
         .eq("id", editingUser.id)
-        .select()
-        .single()
 
       if (error) throw error
 
@@ -118,7 +114,7 @@ export default function UsersManagement({ users: initialUsers, organizations }: 
   const handleEdit = (user: User) => {
     setEditingUser(user)
     form.setValue("organization_id", user.organization_id || "")
-    form.setValue("is_super_user", user.is_super_user)
+    form.setValue("is_super_user", user.is_super_user || false)
     setIsDialogOpen(true)
   }
 
