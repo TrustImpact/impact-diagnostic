@@ -1,8 +1,9 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import AuthDebug from "@/components/debug/auth-debug"
-import ForceLogin from "@/components/debug/force-login"
-import FixedProjectDebug from "@/components/debug/fixed-project-debug"
+import CookieInspector from "@/components/debug/cookie-inspector"
+import CleanLogout from "@/components/debug/clean-logout"
+import DirectLogin from "@/components/debug/direct-login"
 import { ArrowLeft } from "lucide-react"
 
 export default function AuthDebugPage() {
@@ -19,11 +20,22 @@ export default function AuthDebugPage() {
       </div>
 
       <div className="space-y-8 max-w-2xl">
+        <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
+          <h3 className="font-medium text-yellow-800">Authentication Issue Detected</h3>
+          <p className="text-yellow-700 mt-1">
+            Based on your error messages, it appears your auth cookie is in an unexpected format. Try using the Cookie
+            Inspector below to examine the cookie, then use the Clean Logout tool to completely sign out and clear
+            cookies. After that, use the Direct Login tool to sign back in.
+          </p>
+        </div>
+
         <AuthDebug />
 
-        <ForceLogin />
+        <CookieInspector />
 
-        <FixedProjectDebug />
+        <CleanLogout />
+
+        <DirectLogin />
 
         <div className="space-y-4">
           <h2 className="text-xl font-bold">Authentication Troubleshooting</h2>
@@ -42,25 +54,16 @@ export default function AuthDebugPage() {
           <div className="space-y-2">
             <h3 className="font-medium">Try These Solutions:</h3>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Use the "Force Login Fix" button above</li>
-              <li>Click "Refresh Authentication Session" above</li>
-              <li>Log out and log back in</li>
+              <li>Use the "Clean Logout" tool above to completely sign out</li>
+              <li>Use the "Direct Login" tool to sign back in</li>
               <li>Clear your browser cookies and cache</li>
               <li>Try a different browser</li>
               <li>Disable any privacy extensions that might block cookies</li>
             </ul>
           </div>
         </div>
-
-        <div className="flex justify-between">
-          <Button asChild variant="outline">
-            <Link href="/login">Go to Login Page</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/debug/create-test-project">Create Test Project</Link>
-          </Button>
-        </div>
       </div>
     </div>
   )
 }
+
