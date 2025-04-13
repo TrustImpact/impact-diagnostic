@@ -27,7 +27,7 @@ export default function CookieInspector() {
 
       // Try to parse the cookie
       try {
-        const parsedCookie = JSON.parse(authTokenCookie as string)
+        const parsedCookie = JSON.parse(String(authTokenCookie))
         setCookieData(parsedCookie)
       } catch (parseError) {
         // If it's not JSON, show it as a string
