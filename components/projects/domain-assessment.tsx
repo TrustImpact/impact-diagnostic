@@ -41,7 +41,7 @@ export default function DomainAssessment({ project, domain, questions, assessmen
     questions.reduce((acc, q) => ({ ...acc, [q.id]: q.score }), {}),
   )
   const [notes, setNotes] = useState<Record<string, string>>(
-    questions.reduce((acc, q) => ({ ...acc, [q.id]: q.notes }), {}),
+    questions.reduce((acc, q) => ({ ...acc, [q.id]: q.notes || "" }), {}),
   )
   const [saving, setSaving] = useState(false)
 
@@ -65,7 +65,7 @@ export default function DomainAssessment({ project, domain, questions, assessmen
         assessment_id: assessmentId,
         domain: domain.id,
         question_id: q.id,
-        score: scores[q.id] || 0,
+        score: scores[q.id] !== null ? scores[q.id] : 0,
         notes: notes[q.id] || null,
       }))
 
