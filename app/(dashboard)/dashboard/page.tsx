@@ -18,11 +18,10 @@ export default async function DashboardPage() {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Get projects
+  // Get projects using a simpler query that avoids complex joins
   const { data: projects, error: projectsError } = await supabase
     .from("projects")
     .select("*")
-    .or(`owner_id.eq.${session!.user.id},project_collaborators(user_id).eq.${session!.user.id}`)
     .order("created_at", { ascending: false })
 
   // Log for debugging
