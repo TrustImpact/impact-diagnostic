@@ -3,6 +3,7 @@ import { redirect } from "next/navigation"
 import { createServerComponentClient } from "@supabase/auth-helpers-nextjs"
 import UsersManagement from "@/components/admin/users-management"
 import OrganizationsManagement from "@/components/admin/organizations-management"
+import ProjectsManagement from "@/components/admin/projects-management"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 export const dynamic = "force-dynamic"
@@ -104,6 +105,27 @@ export default async function AdminPage() {
     }),
   )
 
+  // Get all projects with owner information
+  const { data: projects } = await supabase.from("projects").select("*")
+
+  // Process projects to include owner information
+  const processedProjects = await Promise.all(
+    (projects || []).map(async (project) => {
+      // Get owner information
+      const { data: owner } = await supabase
+        .from("profiles")
+        .select("email, full_name")
+        .eq("id", project.owner_id)
+        .single()
+
+      return {
+        ...project,
+        owner_email: owner?.email || null,
+        owner_name: owner?.full_name || null,
+      }
+    }),
+  )
+
   return (
     <div className="p-8">
       <h1 className="text-3xl font-bold mb-8">Admin Dashboard</h1>
@@ -112,6 +134,7 @@ export default async function AdminPage() {
         <TabsList>
           <TabsTrigger value="users">Users</TabsTrigger>
           <TabsTrigger value="organizations">Organizations</TabsTrigger>
+          <TabsTrigger value="projects">Projects</TabsTrigger>
         </TabsList>
 
         <TabsContent value="users">
@@ -121,8 +144,11 @@ export default async function AdminPage() {
         <TabsContent value="organizations">
           <OrganizationsManagement organizations={organizations} />
         </TabsContent>
+
+        <TabsContent value="projects">
+          <ProjectsManagement projects={processedProjects} />
+        </TabsContent>
       </Tabs>
     </div>
   )
 }
-
