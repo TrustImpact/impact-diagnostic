@@ -1,16 +1,13 @@
-"use client"
-
 import Link from "next/link"
-import { BarChart, Database, FileText, GitBranch, Settings, Target, Users, type LucideIcon } from "lucide-react"
-import { Progress } from "@/components/ui/progress"
+import { ArrowRight } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Progress } from "@/components/ui/progress"
 
 interface Domain {
   id: string
   name: string
   description: string
-  icon: string
   progress: number
   score: number
   completedQuestions: number
@@ -23,57 +20,42 @@ interface DomainsListProps {
   assessmentId: string
 }
 
-const iconMap: Record<string, LucideIcon> = {
-  Target,
-  FileText,
-  Users,
-  GitBranch,
-  BarChart,
-  Database,
-  Settings,
-}
-
 export default function DomainsList({ domains, projectId, assessmentId }: DomainsListProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-      {domains.map((domain) => {
-        const Icon = iconMap[domain.icon] || Target
-
-        return (
-          <Card key={domain.id} className="overflow-hidden">
-            <CardHeader className="pb-2">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <CardTitle className="flex items-center">
-                    <Icon className="h-5 w-5 mr-2 text-muted-foreground" />
-                    {domain.name}
-                  </CardTitle>
-                  <CardDescription>{domain.description}</CardDescription>
-                </div>
-                {domain.progress > 0 && <div className="text-2xl font-bold">{domain.score.toFixed(1)}</div>}
+      {domains.map((domain) => (
+        <Card key={domain.id} className="flex flex-col">
+          <CardHeader>
+            <CardTitle>{domain.name}</CardTitle>
+          </CardHeader>
+          <CardContent className="flex-1">
+            <p className="text-sm text-muted-foreground mb-4">{domain.description}</p>
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Progress</span>
+                <span>{Math.round(domain.progress)}%</span>
               </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-2">
+              <Progress value={domain.progress} className="h-2" />
+            </div>
+            {domain.completedQuestions > 0 && (
+              <div className="mt-4">
                 <div className="flex justify-between text-sm">
-                  <span className="text-muted-foreground">
-                    {domain.completedQuestions} of {domain.totalQuestions} questions
-                  </span>
-                  <span className="font-medium">{Math.round(domain.progress)}%</span>
+                  <span>Average Score</span>
+                  <span>{domain.score.toFixed(1)}/10</span>
                 </div>
-                <Progress value={domain.progress} className="h-2" />
               </div>
-            </CardContent>
-            <CardFooter className="border-t bg-muted/50 px-6 py-3">
-              <Button asChild className="w-full" variant="outline">
-                <Link href={`/projects/${projectId}/domains/${domain.id}?assessment=${assessmentId}`}>
-                  {domain.progress > 0 ? "Continue Assessment" : "Start Assessment"}
-                </Link>
-              </Button>
-            </CardFooter>
-          </Card>
-        )
-      })}
+            )}
+          </CardContent>
+          <CardFooter>
+            <Button asChild className="w-full">
+              <Link href={`/projects/${projectId}/${domain.id}`}>
+                {domain.completedQuestions > 0 ? "Continue Assessment" : "Start Assessment"}
+                <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </CardFooter>
+        </Card>
+      ))}
     </div>
   )
 }
