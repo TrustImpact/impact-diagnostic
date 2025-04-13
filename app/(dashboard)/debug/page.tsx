@@ -1,9 +1,8 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import EnhancedProjectDebug from "@/components/debug/enhanced-project-debug"
-import ProjectQueryDebug from "@/components/debug/project-query-debug"
-import DirectSqlQuery from "@/components/debug/direct-sql-query"
+import SimpleProjectDebug from "@/components/debug/simple-project-debug"
+import SimpleProjectCreator from "@/components/debug/simple-project-creator"
 
 export const dynamic = "force-dynamic"
 
@@ -32,29 +31,7 @@ export default function DebugPage() {
             <CardDescription>Diagnose issues with project visibility and permissions</CardDescription>
           </CardHeader>
           <CardContent>
-            <ProjectQueryDebug />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Direct SQL Query</CardTitle>
-            <CardDescription>
-              Run SQL queries directly against the database (requires special permissions)
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <DirectSqlQuery />
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Enhanced Project Debug</CardTitle>
-            <CardDescription>Detailed information about users, profiles, organizations, and projects</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <EnhancedProjectDebug />
+            <SimpleProjectDebug />
           </CardContent>
         </Card>
 
@@ -64,12 +41,68 @@ export default function DebugPage() {
             <CardDescription>Create a test project directly in the database</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              <p>Use this tool to create a test project if you're having trouble creating projects through the UI.</p>
-              <Button asChild>
-                <Link href="/debug/create-test-project">Create Test Project</Link>
-              </Button>
+            <SimpleProjectCreator />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Database Relationship Issue</CardTitle>
+            <CardDescription>Information about the organization relationship issue</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
+              <h3 className="font-medium text-yellow-800">Database Schema Issue Detected</h3>
+              <p className="text-yellow-700 mt-1">
+                There appears to be an issue with the relationship between profiles and organizations tables. The error
+                message "Could not embed because more than one relationship was found for 'profiles' and
+                'organizations'" indicates that there are multiple foreign key relationships defined between these
+                tables.
+              </p>
+              <p className="text-yellow-700 mt-2">
+                This is likely causing issues with queries that try to join these tables. The tools on this page have
+                been designed to work around this issue.
+              </p>
             </div>
+
+            <div className="space-y-2">
+              <h3 className="font-medium">Possible Solutions:</h3>
+              <ol className="list-decimal list-inside space-y-1">
+                <li>Use the simplified tools on this page that avoid the problematic relationship</li>
+                <li>
+                  Fix the database schema by removing duplicate foreign key relationships (requires database
+                  administration)
+                </li>
+                <li>Update your application code to avoid joining profiles and organizations tables directly</li>
+              </ol>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Next Steps</CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p>After using these tools, try these steps:</p>
+            <ol className="list-decimal list-inside space-y-2">
+              <li>Create a test project using the Simple Project Creator above</li>
+              <li>
+                Go to the{" "}
+                <Link href="/dashboard" className="text-blue-600 hover:underline">
+                  Dashboard
+                </Link>{" "}
+                to see if your project appears
+              </li>
+              <li>
+                If projects still don't appear, run the Project Visibility Debug tool to check if projects exist in the
+                database
+              </li>
+              <li>
+                If projects exist but don't appear on the dashboard, there might be an issue with the query in the
+                dashboard component
+              </li>
+            </ol>
           </CardContent>
         </Card>
       </div>
