@@ -1,57 +1,78 @@
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import EnhancedProjectDebug from "@/components/debug/enhanced-project-debug"
-import SimpleAuthFix from "@/components/debug/simple-auth-fix"
-import { Shield, LogIn } from "lucide-react"
+import ProjectQueryDebug from "@/components/debug/project-query-debug"
+import DirectSqlQuery from "@/components/debug/direct-sql-query"
+
+export const dynamic = "force-dynamic"
 
 export default function DebugPage() {
   return (
-    <div>
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight">Debug Tools</h1>
+    <div className="container mx-auto py-10 space-y-8">
+      <div className="flex justify-between items-center">
+        <div>
+          <h1 className="text-3xl font-bold">Debug Tools</h1>
+          <p className="text-muted-foreground">Tools to help diagnose and fix issues with your application</p>
+        </div>
         <div className="flex gap-4">
-          <SimpleAuthFix />
           <Button asChild variant="outline">
-            <Link href="/auth-debug">
-              <Shield className="h-4 w-4 mr-2" />
-              Auth Debug
-            </Link>
+            <Link href="/dashboard">Back to Dashboard</Link>
           </Button>
           <Button asChild>
-            <Link href="/special-login">
-              <LogIn className="h-4 w-4 mr-2" />
-              Special Login
-            </Link>
+            <Link href="/auth-debug">Authentication Debug</Link>
           </Button>
         </div>
       </div>
 
-      <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md mb-8">
-        <h3 className="font-medium text-yellow-800">Authentication Error Detected</h3>
-        <p className="text-yellow-700 mt-1">
-          You're seeing "Auth session missing!" errors. Based on the error messages, your auth cookie appears to be in
-          an unexpected format. Please try the following steps:
-        </p>
-        <ol className="list-decimal ml-5 mt-2 space-y-1 text-yellow-700">
-          <li>
-            Go to the{" "}
-            <Link href="/auth-debug" className="text-yellow-800 underline">
-              Auth Debug page
-            </Link>{" "}
-            and use the "Clean Logout" tool
-          </li>
-          <li>
-            Use the{" "}
-            <Link href="/special-login" className="text-yellow-800 underline">
-              Special Login page
-            </Link>{" "}
-            to sign back in
-          </li>
-          <li>If that doesn't work, try using a different browser</li>
-        </ol>
-      </div>
+      <div className="grid gap-8">
+        <Card>
+          <CardHeader>
+            <CardTitle>Project Visibility Debug</CardTitle>
+            <CardDescription>Diagnose issues with project visibility and permissions</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ProjectQueryDebug />
+          </CardContent>
+        </Card>
 
-      <EnhancedProjectDebug />
+        <Card>
+          <CardHeader>
+            <CardTitle>Direct SQL Query</CardTitle>
+            <CardDescription>
+              Run SQL queries directly against the database (requires special permissions)
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            <DirectSqlQuery />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Enhanced Project Debug</CardTitle>
+            <CardDescription>Detailed information about users, profiles, organizations, and projects</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <EnhancedProjectDebug />
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle>Create Test Project</CardTitle>
+            <CardDescription>Create a test project directly in the database</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <p>Use this tool to create a test project if you're having trouble creating projects through the UI.</p>
+              <Button asChild>
+                <Link href="/debug/create-test-project">Create Test Project</Link>
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }
