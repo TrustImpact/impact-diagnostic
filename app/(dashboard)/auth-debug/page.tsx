@@ -4,6 +4,8 @@ import AuthDebug from "@/components/debug/auth-debug"
 import CookieInspector from "@/components/debug/cookie-inspector"
 import CleanLogout from "@/components/debug/clean-logout"
 import DirectLogin from "@/components/debug/direct-login"
+import ArrayFormatFix from "@/components/debug/array-format-fix"
+import ServerArrayFormatTest from "@/components/debug/server-array-format-test"
 import { ArrowLeft } from "lucide-react"
 
 export default function AuthDebugPage() {
@@ -21,13 +23,16 @@ export default function AuthDebugPage() {
 
       <div className="space-y-8 max-w-2xl">
         <div className="bg-yellow-50 border border-yellow-200 p-4 rounded-md">
-          <h3 className="font-medium text-yellow-800">Authentication Issue Detected</h3>
+          <h3 className="font-medium text-yellow-800">Array Format Cookie Detected</h3>
           <p className="text-yellow-700 mt-1">
-            Based on your error messages, it appears your auth cookie is in an unexpected format. Try using the Cookie
-            Inspector below to examine the cookie, then use the Clean Logout tool to completely sign out and clear
-            cookies. After that, use the Direct Login tool to sign back in.
+            Your auth cookie is in an array format instead of a JSON object. This is likely causing authentication
+            issues. Use the Array Format Fix tool below to convert it to the proper format.
           </p>
         </div>
+
+        <ArrayFormatFix />
+
+        <ServerArrayFormatTest />
 
         <AuthDebug />
 
@@ -54,7 +59,8 @@ export default function AuthDebugPage() {
           <div className="space-y-2">
             <h3 className="font-medium">Try These Solutions:</h3>
             <ul className="list-disc pl-5 space-y-1">
-              <li>Use the "Clean Logout" tool above to completely sign out</li>
+              <li>Use the "Array Format Fix" tool above to fix your cookie format</li>
+              <li>Use the "Clean Logout" tool to completely sign out</li>
               <li>Use the "Direct Login" tool to sign back in</li>
               <li>Clear your browser cookies and cache</li>
               <li>Try a different browser</li>
